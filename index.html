@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="src/style.css" />
+    <!-- Add these scripts to your HTML file -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.1/themes/smoothness/jquery-ui.css"
+    />
+  </head>
+  <body>
+    <h1 id="header"></h1>
+    <div id="form-container"></div>
+
+    <div id="dialog" title="Edit Field">
+      <form id="field-form">
+        <label for="label">Label:</label>
+        <input type="text" name="label" id="label" />
+        <br />
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" />
+        <br />
+        <label for="type">Type:</label>
+        <select name="type" id="type">
+          <option value="text">Text</option>
+          <option value="email">Email</option>
+          <option value="number">Number</option>
+        </select>
+        <br />
+        <input type="checkbox" name="required" id="required" />
+        <label for="required">Required</label>
+        <br />
+        <label for="value">Value:</label>
+        <input type="text" name="value" id="value" />
+
+        <label for="placeholder">Placeholder:</label>
+        <input type="text" name="placeholder" id="placeholder" />
+      </form>
+    </div>
+
+    <script src="src/script.js"></script>
+  </body>
+</html>
