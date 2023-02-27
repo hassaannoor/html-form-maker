@@ -2,9 +2,6 @@
 import styles from '!raw-loader!./styles.css';
 import script from '!raw-loader!./script.js';
 
-console.log(styles)
-
-
 function generateHtml(formSteps) {
   return `
 <!DOCTYPE html>
@@ -52,7 +49,6 @@ function download(filename, text) {
   
 function handleDownload(formSteps) {
     const html = generateHtml(formSteps);
-    // console.log(html)
     download('index.html', html);
 }
 

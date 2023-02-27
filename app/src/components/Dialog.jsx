@@ -3,10 +3,6 @@ import { useState } from "react";
 
 export const Dialog = ({ isOpen, fieldData, onSave, onCancel }) => {
   const [formData, setFormData] = useState(fieldData);
-  useEffect(() => {
-    console.log(fieldData);
-    setFormData(fieldData)
-  }, [fieldData]);
 
   const handleSave = () => {
     onSave(formData);

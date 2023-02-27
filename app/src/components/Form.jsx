@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useState } from "react";
 import { Dialog } from "./Dialog";
 import { Download } from "./Download";
@@ -76,7 +75,6 @@ export const Form = () => {
 
 
   const renderForm = (formSteps) => {
-    console.log('rerendering')
     let formHTML = (
         <>
         <button className="secondary" onClick={handlePrevButtonClick}>
@@ -222,8 +220,6 @@ export const Form = () => {
   const handleDialogCancel = () => {
     setIsDialogOpen(false);
   };
-
-  console.log('currentField', currentField.fieldData)
 
   return (
     <>
