@@ -1,6 +1,7 @@
 import './App.css';
 import { Download } from './components/Download';
-import { Form } from './components/Form';
+import { SortableForm as Form } from './components/Form';
+// import { Form }, SortableForm from './components/Form';
 
 function App() {
   return (

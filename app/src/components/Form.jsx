@@ -1,240 +1,206 @@
 import { useState } from "react";
-import { Dialog } from "./Dialog";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Download } from "./Download";
 
+// Sample array of objects representing form steps
+const formSteps = [
+  {
+    stepTitle: "Step 1",
+    fields: [
+      {
+        name: "firstName",
+        label: "First Name",
+        type: "text",
+        placeholder: "Enter your first name",
+        required: true,
+      },
+      {
+        name: "lastName",
+        label: "Last Name",
+        type: "text",
+        placeholder: "Enter your last name",
+        required: true,
+      },
+      {
+        name: "email",
+        label: "Email",
+        type: "email",
+        placeholder: "Enter your email",
+        required: true,
+      },
+      {
+        name: "age",
+        label: "Age",
+        type: "number",
+        placeholder: "Enter your age",
+        required: true,
+      },
+      {
+        name: "gender",
+        label: "Gender",
+        type: "select",
+        options: ["Male", "Female", "Other"],
+        required: true,
+      },
+    ],
+  },
+  {
+    stepTitle: "Step 2",
+    fields: [
+      {
+        name: "address",
+        label: "Address",
+        type: "text",
+        placeholder: "Enter your address",
+        required: true,
+      },
+      {
+        name: "country",
+        label: "Country",
+        type: "select",
+        options: ["USA", "Canada", "Mexico"],
+        required: true,
+      },
+      {
+        name: "subscribeToNewsletter",
+        label: "Subscribe to Newsletter",
+        type: "checkbox",
+        required: false,
+      },
+    ],
+  },
+];
 
-export const Form = () => {
-  const [formSteps, setFormSteps] = useState([
-    {
-      stepTitle: "Step 1",
-      isDisplayed: true,
-      fields: [
-        {
-          name: "firstName",
-          label: "First Name",
-          type: "text",
-          placeholder: "Enter your first name",
-          required: true,
-        },
-        {
-          name: "lastName",
-          label: "Last Name",
-          type: "text",
-          placeholder: "Enter your last name",
-          required: true,
-        },
-        {
-          name: "email",
-          label: "Email",
-          type: "email",
-          placeholder: "Enter your email",
-          required: true,
-        },
-        {
-          name: "age",
-          label: "Age",
-          type: "number",
-          placeholder: "Enter your age",
-          required: true,
-        },
-        {
-          name: "gender",
-          label: "Gender",
-          type: "select",
-          options: ["Male", "Female", "Other"],
-          required: true,
-        },
-      ],
-    },
-    {
-      stepTitle: "Step 2",
-      fields: [
-        {
-          name: "address",
-          label: "Address",
-          type: "text",
-          placeholder: "Enter your address",
-          required: true,
-        },
-        {
-          name: "country",
-          label: "Country",
-          type: "select",
-          options: ["USA", "Canada", "Mexico"],
-          required: true,
-        },
-        {
-          name: "subscribeToNewsletter",
-          label: "Subscribe to Newsletter",
-          type: "checkbox",
-          required: false,
-        },
-      ],
-    },
-  ]);
+export const SortableForm = () => {
+  const [formStepsState, setFormStepsState] = useState(formSteps);
 
+  const onDragEnd = ({ source, destination }) => {
+    if (!destination) {
+      return;
+    }
 
-  const renderForm = (formSteps) => {
-    let formHTML = (
-        <>
-        <button className="secondary" onClick={handlePrevButtonClick}>
-          Prev
-        </button>
-        <button className="secondary" onClick={handleNextButtonClick}>
-          Next
-        </button>
-      </>
+    const newFormSteps = [...formStepsState];
+    const [sourceField, sourceFieldIndex] = findFieldByIndex(
+      source.index,
+      newFormSteps
     );
-    formSteps.forEach((step, index) => {
-      formHTML = (
-        <>
-          {formHTML}
-          <div
-            className="form-step"
-            id={`step-${index+1}`}
-            style={{ display: step.isDisplayed ? "block" : "none" }}
-          >
-            <h2 className="step-title">{step.stepTitle}</h2>
-            {step.fields.map((field, fieldIndex) => (
-              <div className="form-group" key={fieldIndex}>
-                {field.type === "select" ? (
-                  <>
-                    <label htmlFor={field.name}>{field.label}</label>
-                    <select
-                      name={field.name}
-                      id={field.name}
-                      required={field.required}
-                    >
-                      {field.options.map((option, optionIndex) => (
-                        <option value={option} key={optionIndex}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                ) : field.type === "checkbox" ? (
-                  <>
-                    <input
-                      type="checkbox"
-                      name={field.name}
-                      id={field.name}
-                      required={field.required}
-                    />
-                    <label htmlFor={field.name}>{field.label}</label>
-                  </>
-                ) : (
-                  <>
-                    {" "}
-                    <label htmlFor={field.name}>{field.label}</label>
-                    <input
-                      type={field.type}
-                      name={field.name}
-                      id={field.name}
-                      placeholder={field.placeholder}
-                      required={field.required}
-                      onContextMenu={handleContextMenu}
-                    />
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </>
-      );
-    });
-    formHTML = (
-        <div id="form-container">
-            {formHTML}
-            <button type="submit">Submit</button>
-        </div>
+    const [destinationField, destinationFieldIndex] = findFieldByIndex(
+      destination.index,
+      newFormSteps
     );
-    return formHTML;
-  };
 
-  const handlePrevButtonClick = () => {
-    setFormSteps((prevFormSteps) => {
-      const currentStep = getCurrentStep(prevFormSteps);
-      if (currentStep > 0) {
-        prevFormSteps[currentStep].isDisplayed = false;
-        prevFormSteps[currentStep - 1].isDisplayed = true;
+    if (sourceFieldIndex === destinationFieldIndex) {
+      // If the source field and the destination field are in the same step
+      const newFields = [...newFormSteps[sourceFieldIndex].fields];
+      newFields.splice(source.index, 1);
+      newFields.splice(destination.index, 0, sourceField);
+      newFormSteps[sourceFieldIndex].fields = newFields;
+    } else {
+      // If the source field and the destination field are in different steps
+      const sourceFields = [...newFormSteps[sourceFieldIndex].fields];
+      const destinationFields = [...newFormSteps[destinationFieldIndex].fields];
+      sourceFields.splice(source.index, 1);
+      destinationFields.splice(destination.index, 0, sourceField);
+      newFormSteps[sourceFieldIndex].fields = sourceFields;
+      newFormSteps[destinationFieldIndex].fields = destinationFields;
+    }
+
+    setFormStepsState(newFormSteps);
+
+    function findFieldByIndex(index, formSteps) {
+      let currentFieldIndex = index;
+      for (let i = 0; i < formSteps.length; i++) {
+        const fields = formSteps[i].fields;
+        if (currentFieldIndex < fields.length) {
+          return [fields[currentFieldIndex], i];
+        }
+        currentFieldIndex -= fields.length;
       }
-      return [...prevFormSteps];
-    });
-  };
-
-  const handleNextButtonClick = () => {
-    setFormSteps((prevFormSteps) => {
-      const currentStep = getCurrentStep(prevFormSteps);
-      if (currentStep < prevFormSteps.length - 1) {
-        prevFormSteps[currentStep].isDisplayed = false;
-        prevFormSteps[currentStep + 1].isDisplayed = true;
-      }
-      return [...prevFormSteps];
-    });
-  };
-
-  const getCurrentStep = (formSteps) => {
-    const currentStep = formSteps.findIndex((step) => step.isDisplayed);
-    if (currentStep === -1) return  0
-    else return currentStep;
-  };
-
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentField, setCurrentField] = useState({});
-
-  const handleContextMenu = (event) => {
-    event.preventDefault();
-    const fieldName = event.target.name;
-    const stepIndex =
-      parseInt(event.target.closest(".form-step").id.slice(5)) - 1;
-    const fieldIndex = Array.from(
-      event.target.closest(".form-step").children
-    ).indexOf(event.target.closest(".form-group")) - 1;
-    const fieldData = formSteps[stepIndex].fields[fieldIndex];
-
-    setIsDialogOpen(true);
-    setCurrentField({
-      stepIndex,
-      fieldIndex,
-      fieldData,
-    });
-  };
-
-  const handleDialogSave = (formData) => {
-    setFormSteps((prevFormSteps) => {
-      const updatedFieldData = { ...currentField.fieldData, ...formData };
-      const updatedFields = [...prevFormSteps[currentField.stepIndex].fields];
-      updatedFields[currentField.fieldIndex] = updatedFieldData;
-      const updatedStep = {
-        ...prevFormSteps[currentField.stepIndex],
-        fields: updatedFields,
-      };
-      const updatedFormSteps = [...prevFormSteps];
-      updatedFormSteps[currentField.stepIndex] = updatedStep;
-      return updatedFormSteps;
-    });
-    setIsDialogOpen(false);
-  };
-
-  const handleDialogCancel = () => {
-    setIsDialogOpen(false);
+      return [null, -1];
+    }
   };
 
   return (
-    <>
-    <Download formSteps={formSteps}/>
-      {renderForm(formSteps)}
-      {
-        currentField.fieldData ? 
-        <Dialog
-           isOpen={isDialogOpen}
-           fieldData={currentField.fieldData}
-           onSave={handleDialogSave}
-           onCancel={handleDialogCancel}
-        />
-        : <></>
-    }
-    </>
+    <div id="form-container">
+      <DragDropContext onDragEnd={onDragEnd} onDragStart={console.log}>
+        {formStepsState.map((step, stepIndex) => (
+          <Droppable droppableId={`step-${ stepIndex }`} key={stepIndex}>
+            {(provided) => (
+              <div
+                className="form-step"
+                id={`step-${ stepIndex }`}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                <h2 className="step-title">{step.stepTitle}</h2>
+                {step.fields.map((field, fieldIndex) => (
+                  <Draggable
+                    draggableId={`step-${ stepIndex }-field-${fieldIndex}`}
+                    index={fieldIndex + stepIndex + (provided.placeholder?.props?.startIndex || 0)}
+                    key={step.fields[fieldIndex].name}
+                  >
+                    {(provided) => (
+                      <div
+                        className="form-group"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        {field.type === "select" ? (
+                          <>
+                            <label htmlFor={field.name}>{field.label}</label>
+                            <select
+                              name={field.name}
+                              id={field.name}
+                              required={field.required}
+                            >
+                              {field.options.map((option, optionIndex) => (
+                                <option value={option} key={optionIndex}>
+                                  {option}
+                                </option>
+                              ))}
+                            </select>
+                          </>
+                        ) : field.type === "checkbox" ? (
+                          <>
+                            <input
+                              type="checkbox"
+                              name={field.name}
+                              id={field.name}
+                              required={field.required}
+                            />
+                            <label htmlFor={field.name}>{field.label}</label>
+                          </>
+                        ) : (
+                          <>
+                            {" "}
+                            <label htmlFor={field.name}>{field.label}</label>
+                            <input
+                              type={field.type}
+                              name={field.name}
+                              id={field.name}
+                              placeholder={field.placeholder}
+                              required={field.required}
+                              onContextMenu={(event) => {
+                                event.preventDefault();
+                                console.log(field);
+                              }}
+                            />
+                          </>
+                        )}
+                      <p className="add-field-btn">Add field</p>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        ))}
+      </DragDropContext>
+      <button type="submit">Submit</button>
+      <Download formSteps={formStepsState}/>
+    </div>
   );
 };

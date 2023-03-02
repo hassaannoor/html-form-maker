@@ -1,4 +1,8 @@
-  /* Typography */
+* {
+    box-sizing: border-box;
+  }
+
+/* Typography */
   body {
     font-family: "IBM Plex Sans", sans-serif;
     font-size: 16px;
@@ -58,6 +62,7 @@
   
   .form-group {
     margin-bottom: 1rem;
+    position: relative;
   }
   
   label {
@@ -237,6 +242,7 @@
     margin: 50px auto;
     background: #fafafa;
     padding: 20px 40px; 
+    position: relative;
   
   }
   #dialog-container {
@@ -263,3 +269,27 @@
   #next-btn {
     margin-left: 20px;
   }
+
+  .add-field-btn {
+    font-weight: bold;
+    font-size: 12px;    
+    text-align: center;
+    background-color: #FF8C00;
+    color: white;
+    opacity: 0;
+    transition: ease-in-out height 200ms;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 0;
+    bottom: -50%;
+    border-radius: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.form-group:hover .add-field-btn {
+    opacity: 1;
+}
